@@ -6,14 +6,13 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/codeskyblue/go-sh"
+	log "github.com/Sirupsen/logrus"
+	"github.com/operando/golack"
 )
 
 const (
 	GOOGLE_PLAY     = "https://play.google.com/store/apps/details?id="
 	DEFAULT_PACKAGE = "com.kouzoh.mercari"
-	// GOOGLE_PLAY     = "https://dl.dropboxusercontent.com/u/97368150/test.html"
-	// DEFAULT_PACKAGE = ""
 )
 
 var old_update_date string
@@ -24,45 +23,81 @@ func checkUpdate(url string) bool {
 	doc, _ := goquery.NewDocument(url)
 	doc.Find("div .content").Each(func(_ int, s *goquery.Selection) {
 		itemprop, _ := s.Attr("itemprop")
-		fmt.Println(itemprop)
+		log.Debug(itemprop)
 		if itemprop != "datePublished" {
 			return
 		}
-		fmt.Println("Hit!!")
+		log.Debug("Hit!!")
 
 		if old_update_date == "" {
 			old_update_date = s.Text()
-			fmt.Println("Old update date : " + old_update_date)
+			log.Info("Old update date : " + old_update_date)
 		} else {
 			new_update_date = s.Text()
 			if old_update_date != new_update_date {
-				fmt.Println("New update date : " + new_update_date)
+				log.Info("New update date : " + new_update_date)
 				isUpdate = true
 			}
 		}
 	})
-	fmt.Println(isUpdate)
+	log.Debug(isUpdate)
 	return isUpdate
 }
 
 func main() {
 	var sleepTime = flag.Int("t", 1, "sleep time(minute)")
 	var packageName = flag.String("p", DEFAULT_PACKAGE, "package name")
+	var logLevel = flag.String("l", "info", "log level")
+	var configPath = flag.String("c", "", "configuration file path")
 	flag.Parse()
 
+	var config Config
+	setLogLevel(*logLevel)
+	_, err := LoadConfig(*configPath, &config)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	palyload := golack.Payload{
+		config.Slack,
+	}
+
+	sleep := time.Duration(*sleepTime*60) * time.Second
 	url := GOOGLE_PLAY + *packageName
-	fmt.Println("Check Google Play URL : " + url)
+	log.Info("Check Google Play URL : " + url)
 
 	for {
 		if checkUpdate(url) {
-			sh.Command("open", url).Run()
-			fmt.Println("Update!!!!!!!!!!!")
+			// sh.Command("open", url).Run()
+			golack.Post(palyload, config.Webhook)
+			log.Info("Update!!!!!!!!!!!")
 			break
 		} else {
-			fmt.Println("No Update")
+			log.Info("No Update")
 		}
-		time.Sleep(time.Duration(*sleepTime*60) * time.Second)
+		time.Sleep(sleep)
 	}
 
-	fmt.Println("Update check end.")
+	log.Info("Update check end.")
+}
+
+func init() {
+	log.SetLevel(log.DebugLevel)
+}
+
+func setLogLevel(lv string) {
+	switch lv {
+	case "debug", "d":
+		log.SetLevel(log.DebugLevel)
+	case "info", "i":
+		log.SetLevel(log.InfoLevel)
+	case "warn", "w":
+		log.SetLevel(log.WarnLevel)
+	case "error", "e":
+		log.SetLevel(log.ErrorLevel)
+	case "fatal", "f":
+		log.SetLevel(log.FatalLevel)
+	default:
+		log.SetLevel(log.InfoLevel)
+	}
 }
