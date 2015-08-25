@@ -1,4 +1,6 @@
 log = "debug"
+package = "com.kouzoh.mercari"
+sleeptime = 2
 
 [slack]
 text = "test"
