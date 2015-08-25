@@ -1,0 +1,10 @@
+log = "debug"
+
+[slack]
+text = "test"
+username = "bot"
+icon_emoji = ":sushi:"
+channel = "#test"
+
+[webhook]
+url = "webhook_url"
