@@ -13,7 +13,6 @@ go run googleplay_update_checker.go config.go -c config.toml
 
 ```toml
 log = "debug"
-package = "com.mercariapp.mercari" # your Android application package name
 sleeptime = 1
 
 [slack]
@@ -24,5 +23,12 @@ channel = "#test"
 
 [webhook]
 url = "webhook_url" # your Incoming WebHooks URL for Slack
+
+[ios]
+app_id = "id667861049" # your iOS application app id
+country = "jp"
+
+[android]
+package = "com.mercariapp.mercari" # your Android application package name
 
 ```
