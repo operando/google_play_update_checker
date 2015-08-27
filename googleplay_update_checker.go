@@ -11,8 +11,7 @@ import (
 )
 
 const (
-	GOOGLE_PLAY     = "https://play.google.com/store/apps/details?id="
-	DEFAULT_PACKAGE = "com.kouzoh.mercari"
+	GOOGLE_PLAY = "https://play.google.com/store/apps/details?id="
 )
 
 var old_update_date string
