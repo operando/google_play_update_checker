@@ -1,7 +1,6 @@
 # TONKOTSU
 
-Google Play Application Update Checker in Go
-
+Google Play Application & App Store Application Update Checker in Go
 
 ## Run
 
