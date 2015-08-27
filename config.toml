@@ -1,6 +1,5 @@
 log = "debug"
-package = "com.kouzoh.mercari"
-sleeptime = 2
+sleeptime = 1
 
 [slack]
 text = "test"
@@ -10,3 +9,10 @@ channel = "#test"
 
 [webhook]
 url = "webhook_url"
+
+[ios]
+app_id = "id667861049"
+country = "jp"
+
+[android]
+package = "com.mercariapp.mercari"
