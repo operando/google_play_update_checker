@@ -45,14 +45,10 @@ func checkUpdate(url string) bool {
 }
 
 func main() {
-	var sleepTime = flag.Int("t", 1, "sleep time(minute)")
-	var packageName = flag.String("p", DEFAULT_PACKAGE, "package name")
-	var logLevel = flag.String("l", "info", "log level")
 	var configPath = flag.String("c", "", "configuration file path")
 	flag.Parse()
 
 	var config Config
-	setLogLevel(*logLevel)
 	_, err := LoadConfig(*configPath, &config)
 	if err != nil {
 		fmt.Println(err)
@@ -62,8 +58,9 @@ func main() {
 		config.Slack,
 	}
 
-	sleep := time.Duration(*sleepTime*60) * time.Second
-	url := GOOGLE_PLAY + *packageName
+	setLogLevel(config.Log)
+	sleep := time.Duration(config.SleepTime*60) * time.Second
+	url := GOOGLE_PLAY + config.Package
 	log.Info("Check Google Play URL : " + url)
 
 	for {
