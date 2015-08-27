@@ -79,7 +79,7 @@ func main() {
 }
 
 func init() {
-	log.SetLevel(log.DebugLevel)
+	log.SetLevel(log.InfoLevel)
 }
 
 func setLogLevel(lv string) {
