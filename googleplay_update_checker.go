@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -12,10 +13,14 @@ import (
 
 const (
 	GOOGLE_PLAY = "https://play.google.com/store/apps/details?id="
+	APP_STORE   = "https://itunes.apple.com/{{country}}/app/{{appId}}"
 )
 
 var old_update_date string
 var new_update_date string
+
+var oldSoftwareVersion string
+var newSoftwareVersion string
 
 func checkUpdate(url string) bool {
 	doc, err := goquery.NewDocument(url)
@@ -41,6 +46,43 @@ func checkUpdate(url string) bool {
 	return isUpdate
 }
 
+func checkUpdateIos(url string) bool {
+	isUpdate := false
+	doc, err := goquery.NewDocument(url)
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+	doc.Find("ul.list span[itemprop=softwareVersion]").Each(func(_ int, s *goquery.Selection) {
+		log.Debug(s.Text())
+		if oldSoftwareVersion == "" {
+			oldSoftwareVersion = s.Text()
+			log.Info("Old Software Version : " + oldSoftwareVersion)
+		} else {
+			newSoftwareVersion = s.Text()
+			if oldSoftwareVersion != newSoftwareVersion {
+				log.Info("New Software Version : " + newSoftwareVersion)
+				isUpdate = true
+			}
+		}
+	})
+	log.Debug(isUpdate)
+	return isUpdate
+}
+
+func createAppStoreURL(ios Ios) string {
+	replaceCountryURL := strings.Replace(APP_STORE, "{{country}}", ios.Country, 1)
+	appStoreURL := strings.Replace(replaceCountryURL, "{{appId}}", ios.AppId, 1)
+	log.Debug(appStoreURL)
+	return appStoreURL
+}
+
+func createGooglePlayURL(android Android) string {
+	googlePlayURL := GOOGLE_PLAY + android.Package
+	log.Debug(googlePlayURL)
+	return googlePlayURL
+}
+
 func main() {
 	var configPath = flag.String("c", "", "configuration file path")
 	flag.Parse()
@@ -51,18 +93,43 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+	setLogLevel(config.Log)
+	sleep := time.Duration(config.SleepTime*60) * time.Second
+
+	var googlePlayURL string
+	var appStoreURL string
 	palyload := golack.Payload{
 		config.Slack,
 	}
 
-	setLogLevel(config.Log)
-	sleep := time.Duration(config.SleepTime*60) * time.Second
-	url := GOOGLE_PLAY + config.Package
-	log.Info("Check Google Play URL : " + url)
+	checkIos := true
+	if config.Ios.AppId == "" {
+		checkIos = false
+		log.Debug("AppId is empty.")
+	} else {
+		appStoreURL = createAppStoreURL(config.Ios)
+		log.Info("Check App Store URL : " + appStoreURL)
+	}
+	checkAndroid := true
+	if config.Android.Package == "" {
+		checkAndroid = false
+		log.Debug("Package is empty.")
+	} else {
+		googlePlayURL = createGooglePlayURL(config.Android)
+		log.Info("Check Google Play URL : " + googlePlayURL)
+	}
+
 	log.Info("Slack Post Message : " + config.Slack.Text)
 
 	for {
-		if checkUpdate(url) {
+		if checkAndroid && checkUpdate(googlePlayURL) {
+			golack.Post(palyload, config.Webhook)
+			log.Info("Update!!!!!!!!!!!")
+			break
+		} else {
+			log.Info("No Update")
+		}
+		if checkIos && checkUpdateIos(appStoreURL) {
 			golack.Post(palyload, config.Webhook)
 			log.Info("Update!!!!!!!!!!!")
 			break
