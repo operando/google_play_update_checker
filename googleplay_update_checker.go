@@ -18,8 +18,12 @@ var old_update_date string
 var new_update_date string
 
 func checkUpdate(url string) bool {
+	doc, err := goquery.NewDocument(url)
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
 	isUpdate := false
-	doc, _ := goquery.NewDocument(url)
 	doc.Find("div .content").Each(func(_ int, s *goquery.Selection) {
 		itemprop, _ := s.Attr("itemprop")
 		log.Debug(itemprop)
