@@ -24,14 +24,8 @@ func checkUpdate(url string) bool {
 		return false
 	}
 	isUpdate := false
-	doc.Find("div .content").Each(func(_ int, s *goquery.Selection) {
-		itemprop, _ := s.Attr("itemprop")
-		log.Debug(itemprop)
-		if itemprop != "datePublished" {
-			return
-		}
-		log.Debug("Hit!!")
-
+	doc.Find("div[itemprop=\"datePublished\"]").Each(func(_ int, s *goquery.Selection) {
+		log.Debug(s.Text())
 		if old_update_date == "" {
 			old_update_date = s.Text()
 			log.Info("Old update date : " + old_update_date)
