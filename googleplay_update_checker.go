@@ -62,10 +62,10 @@ func main() {
 	sleep := time.Duration(config.SleepTime*60) * time.Second
 	url := GOOGLE_PLAY + config.Package
 	log.Info("Check Google Play URL : " + url)
+	log.Info("Slack Post Message : " + config.Slack.Text)
 
 	for {
 		if checkUpdate(url) {
-			// sh.Command("open", url).Run()
 			golack.Post(palyload, config.Webhook)
 			log.Info("Update!!!!!!!!!!!")
 			break
