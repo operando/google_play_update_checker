@@ -122,19 +122,23 @@ func main() {
 	log.Info("Slack Post Message : " + config.Slack.Text)
 
 	for {
-		if checkAndroid && checkUpdate(googlePlayURL) {
-			golack.Post(palyload, config.Webhook)
-			log.Info("Update!!!!!!!!!!!")
-			break
-		} else {
-			log.Info("No Update")
+		if checkAndroid {
+			if checkUpdate(googlePlayURL) {
+				golack.Post(palyload, config.Webhook)
+				log.Info("Update!!!!!!!!!!!")
+				break
+			} else {
+				log.Info("No Update")
+			}
 		}
-		if checkIos && checkUpdateIos(appStoreURL) {
-			golack.Post(palyload, config.Webhook)
-			log.Info("Update!!!!!!!!!!!")
-			break
-		} else {
-			log.Info("No Update")
+		if checkIos {
+			if checkUpdateIos(appStoreURL) {
+				golack.Post(palyload, config.Webhook)
+				log.Info("Update!!!!!!!!!!!")
+				break
+			} else {
+				log.Info("No Update")
+			}
 		}
 		time.Sleep(sleep)
 	}
