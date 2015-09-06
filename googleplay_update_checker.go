@@ -98,7 +98,7 @@ func main() {
 
 	var googlePlayURL string
 	var appStoreURL string
-	palyload := golack.Payload{
+	payload := golack.Payload{
 		config.Slack,
 	}
 
@@ -124,7 +124,7 @@ func main() {
 	for {
 		if checkAndroid {
 			if checkUpdate(googlePlayURL) {
-				golack.Post(palyload, config.Webhook)
+				golack.Post(payload, config.Webhook)
 				log.Info("Update!!!!!!!!!!!")
 				break
 			} else {
@@ -133,7 +133,7 @@ func main() {
 		}
 		if checkIos {
 			if checkUpdateIos(appStoreURL) {
-				golack.Post(palyload, config.Webhook)
+				golack.Post(payload, config.Webhook)
 				log.Info("Update!!!!!!!!!!!")
 				break
 			} else {
