@@ -1,3 +1,5 @@
+# Deprecated Repository.You have to migrate the repository. https://github.com/operando/tonkotsu
+
 # TONKOTSU
 
 Google Play Application & App Store Application Update Checker in Go
