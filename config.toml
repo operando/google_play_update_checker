@@ -6,6 +6,7 @@ text = "test"
 username = "bot"
 icon_emoji = ":sushi:"
 channel = "#test"
+link_names = true
 
 [webhook]
 url = "webhook_url"

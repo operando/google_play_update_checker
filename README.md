@@ -19,6 +19,7 @@ text = "TONKOTSU TEST"
 username = "TONKOTSU bot"
 icon_emoji = ":pig:"
 channel = "#test"
+link_names = true
 
 [webhook]
 url = "webhook_url" # your Incoming WebHooks URL for Slack
